@@ -8,7 +8,7 @@ import OSS from 'ali-oss'
 import { normalize, slash } from './utils'
 import fs from 'fs'
 
-export default function assetUploaderPlugin(options: PluginOptions): Plugin {
+const assetUploaderPlugin = (options: PluginOptions): Plugin => {
   const oss = new OSS({
     region: options.region,
     accessKeyId: options.accessKeyId,
@@ -193,3 +193,4 @@ export default function assetUploaderPlugin(options: PluginOptions): Plugin {
     }
   }
 }
+export default assetUploaderPlugin
