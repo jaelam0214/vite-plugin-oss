@@ -1,0 +1,40 @@
+{
+  "name": "vite-plugin-oss",
+  "version": "1.0.1",
+  "description": "打包上传到阿里云OSS",
+  "author": "jae <494595074@qq.com>",
+  "main": "./src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jaelam0214/vite-plugin-oss.git"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "node_modules/.bin/tsc --newLine lf -d"
+  },
+  "keywords": [
+    "vite",
+    "plugin",
+    "oss"
+  ],
+  "engines": {
+    "node": ">=14"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/ali-oss": "^6.16.2",
+    "@types/glob": "^7.2.0",
+    "@types/node": "^16.11.7",
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "@typescript-eslint/parser": "^5.4.0",
+    "tsup": "^5.7.0",
+    "typescript": "^4.4.4",
+    "vite-plugin-inspect": "^0.3.10"
+  },
+  "dependencies": {
+    "ali-oss": "^6.16.0",
+    "colors": "^1.4.0",
+    "glob": "^7.2.0",
+    "vite": "^2.6.14"
+  }
+}
