@@ -1,5 +1,5 @@
 import { Plugin } from 'vite'
-import path from 'path'
+import * as path from 'path'
 import { defaultOption, PluginOptions } from './type'
 // import ora from 'ora'
 import { glob } from 'glob'

@@ -1,16 +1,16 @@
 {
   "name": "vite-plugin-oss",
-  "version": "1.0.1",
+  "version": "1.0.4",
   "description": "打包上传到阿里云OSS",
   "author": "jae <494595074@qq.com>",
-  "main": "./src/index.js",
+  "main": "./dist/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/jaelam0214/vite-plugin-oss.git"
   },
   "scripts": {
     "dev": "vite",
-    "build": "node_modules/.bin/tsc --newLine lf -d"
+    "build": "tsup src"
   },
   "keywords": [
     "vite",
@@ -27,7 +27,7 @@
     "@types/node": "^16.11.7",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
-    "tsup": "^5.7.0",
+    "tsup": "^5.7.2",
     "typescript": "^4.4.4",
     "vite-plugin-inspect": "^0.3.10"
   },

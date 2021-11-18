@@ -5,15 +5,14 @@
     "moduleResolution": "node",
     "strict": true,
     "jsx": "preserve",
-    "sourceMap": true,
+    "sourceMap": false,
     "esModuleInterop": true,
     "types": [
       "vite/client",
       "typescript",
       "ali-oss",
       "node",
-      "globby",
-      "ora"
+      "glob",
     ],
     "lib": [
       "esnext",
