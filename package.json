@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-oss",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "将打包好的文件目录上传到阿里云OSS",
   "author": "jae <494595074@qq.com>",
   "main": "./dist/index.js",
