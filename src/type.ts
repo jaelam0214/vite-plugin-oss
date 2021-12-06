@@ -18,6 +18,8 @@ export type OptionalOptions = {
   overwrite?: boolean  // 覆盖oss同名文件
   bail?: boolean  // 出错中断上传
   quitWpOnError?: boolean // 出错中断打包
+  version?: string
+  setVersion?: (data: { version: string }) => void
 }
 
 export type PluginOptions = OSSOptions & OptionalOptions
@@ -30,8 +32,8 @@ export const defaultOption = {
   buildRoot: '.',
   deleteOrigin: false,
   deleteEmptyDir: false,
-  timeout: 30 * 1000,
+  timeout: 60 * 1000,
   overwrite: true,
-  bail: false,
+  bail: true,
   quitWpOnError: false,
 } as OptionalOptions

@@ -1,7 +1,6 @@
 import { Plugin } from 'vite'
 import * as path from 'path'
 import { defaultOption, PluginOptions } from './type'
-// import ora from 'ora'
 import { glob } from 'glob'
 import { red, blue, bgRed, green, underline, white } from 'colors'
 import OSS from 'ali-oss'
@@ -26,7 +25,8 @@ const assetUploaderPlugin = (options: PluginOptions): Plugin => {
     test,
     overwrite,
     bail,
-    quitWpOnError,
+    version,
+    setVersion
   } = Object.assign(defaultOption, options)
   /**
    * 上传文件
@@ -51,7 +51,9 @@ const assetUploaderPlugin = (options: PluginOptions): Plugin => {
     const filesErrors = []  // 上传失败文件列表
 
     const basePath = getBasePath(inVite, outputPath)
-    for (let file of _files) {
+    const fileCount = _files.length
+    for (let i = 0; i < fileCount; i++) {
+      const file = _files[i]
       const { fullPath: filePath, path: fPath } = file
       // 为每个文件设置上传的绝对路径
       let ossFilePath = slash(
@@ -78,8 +80,6 @@ const assetUploaderPlugin = (options: PluginOptions): Plugin => {
       }
 
       try {
-        // ora(`${underline(fPath)} is uploading to ${underline(ossFilePath)}`).start()
-
         let result = await oss.put(ossFilePath, filePath, {
           timeout,
           headers: !overwrite ? { "Cache-Control": "max-age=31536000", 'x-oss-forbid-overwrite': true } : {}
@@ -88,7 +88,8 @@ const assetUploaderPlugin = (options: PluginOptions): Plugin => {
         result.url = normalize(result.url)
         filesUploaded.push(fPath)
 
-        // verbose && ora(`${blue(underline(fPath))} successfully uploaded, oss url =>  ${link(result.url, green(result.url))}`).succeed()
+        const fileCount = _files.length
+        verbose && console.log(`${i + 1}/${fileCount} ${blue(underline(fPath))} successfully uploaded, oss url =>  ${green(underline(result.url))}`)
 
         if (deleteOrigin) {
           fs.unlinkSync(filePath)
@@ -103,7 +104,7 @@ const assetUploaderPlugin = (options: PluginOptions): Plugin => {
         })
 
         const errorMsg = red(`Failed to upload ${underline(fPath)}: ${err.name}-${err.code}: ${err.message}`)
-        // ora(errorMsg).fail()
+        console.log(red(errorMsg))
 
         if (bail) {
           console.log(` ${bgRed(white('UPLOADING STOPPED'))} `, '\n')
@@ -111,7 +112,13 @@ const assetUploaderPlugin = (options: PluginOptions): Plugin => {
         }
       }
     }
-
+    try {
+      if (setVersion && version) {
+        setVersion({ version: version })
+      }
+    } catch (err: any) {
+      console.log(red(`更新版本号出错了...`))
+    }
   }
 
   /**
