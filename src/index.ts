@@ -175,16 +175,20 @@ const assetUploaderPlugin = (options: PluginOptions): Plugin => {
       })
     }
   }
-
+  let outputPath = ''
   return {
     name: 'vite-plugin-oss',
     // 在解析 Vite 配置后调用。使用这个钩子读取和存储最终解析的配置。当插件需要根据运行的命令做一些不同的事情时，它也很有用。
-    // 打包好之后
     configResolved: async (config) => {
       // 获取需要上传的文件目录路径
-      const outputPath = path.resolve(slash(config.build.outDir))
+      outputPath = path.resolve(slash(config.build.outDir))
+    },
+    // 打包完成后执行上传
+    closeBundle: async () => {
       // 获取需要上传的文件目录路径的所有文件的路径列表
       const files = await glob.sync(from)
+      console.log(`需要更新上传的文件目录${files}`)
+
       if (files.length) {
         try {
           await upload(files, true, outputPath)
