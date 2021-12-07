@@ -15,8 +15,11 @@ export declare type OptionalOptions = {
     timeout?: number;
     setOssPath?: (filePath: string) => string;
     overwrite?: boolean;
-    bail?: boolean;
     quitWpOnError?: boolean;
+    version?: string;
+    setVersion?: (data: {
+        version: string;
+    }) => void;
 };
 export declare type PluginOptions = OSSOptions & OptionalOptions;
 export declare const defaultOption: OptionalOptions;

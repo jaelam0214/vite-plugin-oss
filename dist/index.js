@@ -24,7 +24,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const path = __importStar(require("path"));
 const type_1 = require("./type");
-// import ora from 'ora'
 const glob_1 = require("glob");
 const colors_1 = require("colors");
 const ali_oss_1 = __importDefault(require("ali-oss"));
@@ -37,7 +36,7 @@ const assetUploaderPlugin = (options) => {
         accessKeySecret: options.accessKeySecret,
         bucket: options.bucket
     });
-    const { from, dist, deleteOrigin, deleteEmptyDir, setOssPath, timeout, verbose, test, overwrite, bail, quitWpOnError, } = Object.assign(type_1.defaultOption, options);
+    const { from, dist, deleteOrigin, deleteEmptyDir, setOssPath, timeout, verbose, test, overwrite, version, setVersion } = Object.assign(type_1.defaultOption, options);
     /**
      * 上传文件
      * @param files 所有需要上传的文件的路径列表
@@ -61,14 +60,17 @@ const assetUploaderPlugin = (options) => {
         const filesIgnored = []; // 已忽略的文件列表
         const filesErrors = []; // 上传失败文件列表
         const basePath = getBasePath(inVite, outputPath);
-        for (let file of _files) {
+        const fileCount = _files.length;
+        for (let i = 0; i < fileCount; i++) {
+            const file = _files[i];
             const { fullPath: filePath, path: fPath } = file;
             // 为每个文件设置上传的绝对路径
-            let ossFilePath = (0, utils_1.slash)(path.join(dist, (setOssPath && setOssPath(filePath)
+            let ossFilePath = await (0, utils_1.slash)(path.join(dist, (setOssPath && setOssPath(filePath)
                 || basePath && filePath.split(basePath)[1]
                 || '')));
             // 查看OSS中是否存在该文件
             const fileExists = await getFileExists(ossFilePath);
+            console.log((0, colors_1.yellow)(`\n oss中 ${(0, colors_1.underline)(ossFilePath)} ${fileExists ? '已存在' : '不存在'}`));
             // OSS已有该文件且不需覆盖，则将文件加入忽略名单
             if (fileExists && !overwrite) {
                 filesIgnored.push(filePath);
@@ -76,18 +78,18 @@ const assetUploaderPlugin = (options) => {
             }
             // 测试模式
             if (test) {
-                console.log((0, colors_1.blue)(fPath), `is ready to upload to ${(0, colors_1.green)(ossFilePath)}`);
+                console.log((0, colors_1.blue)(fPath), `is ready to upload to ${(0, colors_1.green)(ossFilePath)} \n`);
                 continue;
             }
             try {
-                // ora(`${underline(fPath)} is uploading to ${underline(ossFilePath)}`).start()
+                verbose && console.log(`\n ${i + 1}/${fileCount} ${(0, colors_1.white)((0, colors_1.underline)(fPath))} uploading...`);
                 let result = await oss.put(ossFilePath, filePath, {
                     timeout,
                     headers: !overwrite ? { "Cache-Control": "max-age=31536000", 'x-oss-forbid-overwrite': true } : {}
                 });
                 result.url = (0, utils_1.normalize)(result.url);
                 filesUploaded.push(fPath);
-                // verbose && ora(`${blue(underline(fPath))} successfully uploaded, oss url =>  ${link(result.url, green(result.url))}`).succeed()
+                verbose && console.log(`\n ${i + 1}/${fileCount} ${(0, colors_1.blue)((0, colors_1.underline)(fPath))} successfully uploaded, oss url =>  ${(0, colors_1.green)((0, colors_1.underline)(result.url))}`);
                 if (deleteOrigin) {
                     fs_1.default.unlinkSync(filePath);
                     if (deleteEmptyDir && files.every(f => f.indexOf(path.dirname(filePath)) === -1)) {
@@ -100,13 +102,18 @@ const assetUploaderPlugin = (options) => {
                     file: fPath,
                     err: { code: err.code, message: err.message, name: err.name }
                 });
-                const errorMsg = (0, colors_1.red)(`Failed to upload ${(0, colors_1.underline)(fPath)}: ${err.name}-${err.code}: ${err.message}`);
-                // ora(errorMsg).fail()
-                if (bail) {
-                    console.log(` ${(0, colors_1.bgRed)((0, colors_1.white)('UPLOADING STOPPED'))} `, '\n');
-                    break;
-                }
+                const errorMsg = (0, colors_1.red)(`\n Failed to upload ${(0, colors_1.underline)(fPath)}: ${err.name}-${err.code}: ${err.message}`);
+                console.log((0, colors_1.red)(errorMsg));
             }
+        }
+        try {
+            if (setVersion && version && !test) {
+                await setVersion({ version: version });
+                console.log('更新版本号');
+            }
+        }
+        catch (err) {
+            console.log((0, colors_1.red)(`更新版本号出错了...`));
         }
     };
     /**
@@ -184,7 +191,7 @@ const assetUploaderPlugin = (options) => {
             const files = await glob_1.glob.sync(from);
             if (files.length) {
                 try {
-                    upload(files, true, outputPath);
+                    await upload(files, true, outputPath);
                 }
                 catch (err) {
                     console.log((0, colors_1.red)(err));

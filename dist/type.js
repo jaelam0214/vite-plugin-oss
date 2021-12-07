@@ -8,8 +8,7 @@ exports.defaultOption = {
     buildRoot: '.',
     deleteOrigin: false,
     deleteEmptyDir: false,
-    timeout: 30 * 1000,
+    timeout: 60 * 1000,
     overwrite: true,
-    bail: false,
     quitWpOnError: false,
 };

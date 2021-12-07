@@ -2,7 +2,7 @@ import { Plugin } from 'vite'
 import * as path from 'path'
 import { defaultOption, PluginOptions } from './type'
 import { glob } from 'glob'
-import { red, blue, bgRed, green, underline, white } from 'colors'
+import { red, blue, green, underline, yellow, white } from 'colors'
 import OSS from 'ali-oss'
 import { normalize, slash } from './utils'
 import fs from 'fs'
@@ -24,7 +24,6 @@ const assetUploaderPlugin = (options: PluginOptions): Plugin => {
     verbose,
     test,
     overwrite,
-    bail,
     version,
     setVersion
   } = Object.assign(defaultOption, options)
@@ -56,7 +55,7 @@ const assetUploaderPlugin = (options: PluginOptions): Plugin => {
       const file = _files[i]
       const { fullPath: filePath, path: fPath } = file
       // 为每个文件设置上传的绝对路径
-      let ossFilePath = slash(
+      let ossFilePath = await slash(
         path.join(
           dist as string,
           (
@@ -68,6 +67,8 @@ const assetUploaderPlugin = (options: PluginOptions): Plugin => {
       )
       // 查看OSS中是否存在该文件
       const fileExists = await getFileExists(ossFilePath)
+      console.log(yellow(`\n oss中 ${underline(ossFilePath)} ${fileExists ? '已存在' : '不存在'}`))
+
       // OSS已有该文件且不需覆盖，则将文件加入忽略名单
       if (fileExists && !overwrite) {
         filesIgnored.push(filePath)
@@ -75,11 +76,13 @@ const assetUploaderPlugin = (options: PluginOptions): Plugin => {
       }
       // 测试模式
       if (test) {
-        console.log(blue(fPath), `is ready to upload to ${green(ossFilePath)}`)
+        console.log(blue(fPath), `is ready to upload to ${green(ossFilePath)} \n`)
         continue
       }
 
       try {
+        verbose && console.log(`\n ${i + 1}/${fileCount} ${white(underline(fPath))} uploading...`)
+
         let result = await oss.put(ossFilePath, filePath, {
           timeout,
           headers: !overwrite ? { "Cache-Control": "max-age=31536000", 'x-oss-forbid-overwrite': true } : {}
@@ -87,9 +90,7 @@ const assetUploaderPlugin = (options: PluginOptions): Plugin => {
 
         result.url = normalize(result.url)
         filesUploaded.push(fPath)
-
-        const fileCount = _files.length
-        verbose && console.log(`${i + 1}/${fileCount} ${blue(underline(fPath))} successfully uploaded, oss url =>  ${green(underline(result.url))}`)
+        verbose && console.log(`\n ${i + 1}/${fileCount} ${blue(underline(fPath))} successfully uploaded, oss url =>  ${green(underline(result.url))}`)
 
         if (deleteOrigin) {
           fs.unlinkSync(filePath)
@@ -103,18 +104,14 @@ const assetUploaderPlugin = (options: PluginOptions): Plugin => {
           err: { code: err.code, message: err.message, name: err.name }
         })
 
-        const errorMsg = red(`Failed to upload ${underline(fPath)}: ${err.name}-${err.code}: ${err.message}`)
+        const errorMsg = red(`\n Failed to upload ${underline(fPath)}: ${err.name}-${err.code}: ${err.message}`)
         console.log(red(errorMsg))
-
-        if (bail) {
-          console.log(` ${bgRed(white('UPLOADING STOPPED'))} `, '\n')
-          break
-        }
       }
     }
     try {
-      if (setVersion && version) {
-        setVersion({ version: version })
+      if (setVersion && version && !test) {
+        await setVersion({ version: version })
+        console.log('更新版本号')
       }
     } catch (err: any) {
       console.log(red(`更新版本号出错了...`))
@@ -190,7 +187,7 @@ const assetUploaderPlugin = (options: PluginOptions): Plugin => {
       const files = await glob.sync(from)
       if (files.length) {
         try {
-          upload(files, true, outputPath)
+          await upload(files, true, outputPath)
         } catch (err: any) {
           console.log(red(err))
         }

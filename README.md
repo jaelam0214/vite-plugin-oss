@@ -13,14 +13,15 @@ npm i vite-plugin-oss -D
 * from: 必传。上传哪些文件，支持类似gulp.src的glob方法，如'./build/**', 为glob字符串。
 * dist: 上传到oss哪个目录下，默认为oss根目录。可作为路径前缀使用。
 * timeout: oss超时设置，默认为30秒(30000)
-* overwrite: 是否覆盖oss同名文件。默认true
-* verbose: 是否显示上传日志，默认为true
-* deletOrigin: 上传完成是否删除原文件，默认false
+* overwrite: 是否覆盖oss同名文件。默认true。
+* verbose: 是否显示上传日志，默认为true。
+* deletOrigin: 上传完成是否删除原文件，默认false。
 * deleteEmptyDir: 如果某个目录下的文件都上传过了，是否删除此目录。deleteOrigin为true时候生效。默认false。
 * setOssPath: 自定义每个文件上传路径。接收参数为当前文件路径。不传，或者所传函数返回false则按默认方式上传。
-* test: 测试，仅查看文件和上传路径，但是不执行上传操作。默认false
-* bail: 出错是否中断上传。默认false
-* quitWpOnError: 出错是否中断打包。默认false
+* test: 测试，仅查看文件和上传路径，但是不执行上传操作。默认false。
+* quitWpOnError: 出错是否中断打包。默认false。
+* version: 版本号。默认为''。
+* setVersion: 设置线上的版本号的方法。一般为axios请求方法，需同时配置version。
 ## 注意: accessKeyId, accessKeySecret 很重要，注意保密!!!
 
 # Basic Exapmle 基本例子
@@ -103,4 +104,4 @@ export default ({ mode }) => {
 * 优化代码结构
 * 集成七牛云OSS等其他SDK
 * 优化控制台输出日志
-* 欢迎感兴趣的小伙伴加入，欢迎各位大佬指点、PR~
+* ...

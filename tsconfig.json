@@ -12,9 +12,6 @@
     "types": [
       "vite/client",
       "typescript",
-      "ali-oss",
-      "node",
-      "glob",
     ],
     "lib": [
       "esnext",

@@ -16,7 +16,6 @@ export type OptionalOptions = {
   timeout?: number  // 超时时间
   setOssPath?: (filePath: string) => string // 手动设置每个文件的上传路径
   overwrite?: boolean  // 覆盖oss同名文件
-  bail?: boolean  // 出错中断上传
   quitWpOnError?: boolean // 出错中断打包
   version?: string
   setVersion?: (data: { version: string }) => void
@@ -34,6 +33,5 @@ export const defaultOption = {
   deleteEmptyDir: false,
   timeout: 60 * 1000,
   overwrite: true,
-  bail: true,
   quitWpOnError: false,
 } as OptionalOptions
