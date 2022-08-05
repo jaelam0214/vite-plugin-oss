@@ -186,7 +186,7 @@ const assetUploaderPlugin = (options: PluginOptions): Plugin => {
     // 打包完成后执行上传
     closeBundle: async () => {
       // 获取需要上传的文件目录路径的所有文件的路径列表
-      const files = await glob.sync(from)
+      const files = glob.sync(from)
       console.log(`需要更新上传的文件目录${files}`)
 
       if (files.length) {
